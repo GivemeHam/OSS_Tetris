@@ -110,7 +110,7 @@ int main(int argc, char **argv) { // {{{
 	return 0;
 } // }}}
 void playGame(){
-	game = newTetrisGame();
+	game =    newTetrisGame();
 	// create space for the board
 	for (int i = 0; i < game->height + 2; i++) printf("\n");
 	printBoard(game);
@@ -119,4 +119,8 @@ void playGame(){
 		processInputs(game);
 	}
 	destroyTetrisGame(game);
+	replay();
+}
+int replay(){
+
 }
