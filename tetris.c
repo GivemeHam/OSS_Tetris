@@ -77,9 +77,19 @@ static void nextBrick(TetrisGame *game) { // {{{
 
 TetrisGame *newTetrisGame(unsigned int width, unsigned int height) { // {{{
 	TetrisGame *game = malloc(sizeof(TetrisGame));
+	initGame(game);
+	// init terminal for non-blocking and no-echo getchar()
+	initTerm(game);
+	// init signals for timer and errors
+	initSig();
+	// init timer
+	initTimer(game);
+	return game;
+} // }}}
+void *initGame(TetrisGame *game){
 	dieIfOutOfMemory(game);
-	game->width = width;
-	game->height = height;
+	game->width = 10;
+	game->height = 20;
 	game->size = width * height;
 	game->board = calloc(game->size, sizeof(char));
 	dieIfOutOfMemory(game->board);
@@ -89,7 +99,9 @@ TetrisGame *newTetrisGame(unsigned int width, unsigned int height) { // {{{
 	game->score = 0;
 	nextBrick(game); // fill preview
 	nextBrick(game); // put into game
-	// init terminal for non-blocking and no-echo getchar()
+}
+
+void initTerm(TetrisGame *game){
 	struct termios term;
 	tcgetattr(STDIN_FILENO, &game->termOrig);
 	tcgetattr(STDIN_FILENO, &term);
@@ -97,7 +109,8 @@ TetrisGame *newTetrisGame(unsigned int width, unsigned int height) { // {{{
 	term.c_cc[VTIME] = 0;
 	term.c_cc[VMIN] = 0;
 	tcsetattr(STDIN_FILENO, TCSANOW, &term);
-	// init signals for timer and errors
+}
+void initSig(){
 	struct sigaction signalAction;
 	sigemptyset(&signalAction.sa_mask);
 	signalAction.sa_handler = signalHandler;
@@ -106,12 +119,11 @@ TetrisGame *newTetrisGame(unsigned int width, unsigned int height) { // {{{
 	sigaction(SIGTERM, &signalAction, NULL);
 	sigaction(SIGSEGV, &signalAction, NULL);
 	sigaction(SIGALRM, &signalAction, NULL);
-	// init timer
+}
+void initTimer(TetrisGame *game){
 	game->timer.it_value.tv_usec = game->sleepUsec;
 	setitimer(ITIMER_REAL, &game->timer, NULL);
-	return game;
-} // }}}
-
+}
 void destroyTetrisGame(TetrisGame *game) { // {{{
 	if (game == NULL) return;
 	tcsetattr(STDIN_FILENO, TCSANOW, &game->termOrig);

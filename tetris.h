@@ -37,8 +37,14 @@ typedef struct { // TetrisGame {{{
 
 extern void signalHandler(int signal);
 extern void printBoard(TetrisGame *game);
+extern void playGame();
 
-TetrisGame *newTetrisGame(unsigned int width, unsigned int height);
+TetrisGame *newTetrisGame();
+void *initGame(TetrisGame *game);
+void *initTerm(TetrisGame *game);
+void *initSig();
+void *initTimer(TetrisGame *game);
+
 void destroyTetrisGame(TetrisGame *game);
 void processInputs(TetrisGame *game);
 void tick(TetrisGame *game);

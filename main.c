@@ -106,7 +106,11 @@ void signalHandler(int signal) { // {{{
 int main(int argc, char **argv) { // {{{
 	srand(time(0));
 	welcome();
-	game = newTetrisGame(10, 20);
+	playGame();
+	return 0;
+} // }}}
+void playGame(){
+	game = newTetrisGame();
 	// create space for the board
 	for (int i = 0; i < game->height + 2; i++) printf("\n");
 	printBoard(game);
@@ -115,6 +119,4 @@ int main(int argc, char **argv) { // {{{
 		processInputs(game);
 	}
 	destroyTetrisGame(game);
-	return 0;
-} // }}}
-
+}
