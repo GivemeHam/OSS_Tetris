@@ -90,7 +90,7 @@ void *initGame(TetrisGame *game){
 	dieIfOutOfMemory(game);
 	game->width = 10;
 	game->height = 20;
-	game->size = width * height;
+	game->size = game->width * game->height;
 	game->board = calloc(game->size, sizeof(char));
 	dieIfOutOfMemory(game->board);
 	game->isRunning = 1;
@@ -243,8 +243,7 @@ static void rotateBrick(TetrisGame *game, char direction) { // {{{
 } // }}}
 
 static void dropBrick(TetrisGame *game){
-	while(moveBrick(game, 0 ,1))
-		;
+	while(moveBrick(game, 0 ,1));
 }
 
 void processInputs(TetrisGame *game) { // {{{
