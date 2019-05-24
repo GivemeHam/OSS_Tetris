@@ -41,9 +41,9 @@ extern void playGame();
 
 TetrisGame *newTetrisGame();
 void *initGame(TetrisGame *game);
-void *initTerm(TetrisGame *game);
-void *initSig();
-void *initTimer(TetrisGame *game);
+void initTerm(TetrisGame *game);
+void initSig();
+void initTimer(TetrisGame *game);
 
 void destroyTetrisGame(TetrisGame *game);
 void processInputs(TetrisGame *game);

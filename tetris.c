@@ -56,8 +56,22 @@ static void nextBrick(TetrisGame *game) { // {{{
 	game->brick.y = 0;
 	game->nextBrick.type = rand() % numBrickTypes;
 	game->nextBrick.rotation = rand() % 4;
-	game->nextBrick.color = game->brick.color % 7 + 1; // (color-1 + 1) % 7 + 1, range is 1..7
-	game->nextBrick.x = 0;
+	switch (game->nextBrick.type){
+		case 0 : game->nextBrick.color = 1; 
+			break;
+		case 1 : game->nextBrick.color = 2;
+			break;
+		case 2 : game->nextBrick.color = 3;
+			break;
+		case 3 : game->nextBrick.color = 4;
+			break;
+		case 4 : game->nextBrick.color = 5;
+			break;
+		case 5 : game->nextBrick.color = 6;
+			break;
+		case 6 : game->nextBrick.color = 7;
+			break;
+		}game->nextBrick.x = 0;
 	game->nextBrick.y = 0;
 } // }}}
 
@@ -76,7 +90,7 @@ void *initGame(TetrisGame *game){
 	dieIfOutOfMemory(game);
 	game->width = 10;
 	game->height = 20;
-	game->size = width * height;
+	game->size = game->width * game->height;
 	game->board = calloc(game->size, sizeof(char));
 	dieIfOutOfMemory(game->board);
 	game->isRunning = 1;
@@ -205,15 +219,17 @@ static void pauseUnpause(TetrisGame *game) { // {{{
 	game->isPaused ^= 1;
 } // }}}
 
-static void moveBrick(TetrisGame *game, char x, char y) { // {{{
+int moveBrick(TetrisGame *game, char x, char y) { // {{{
 	if (game->isPaused) return;
 	game->brick.x += x;
 	game->brick.y += y;
 	if (brickCollides(game)) {
 		game->brick.x -= x;
 		game->brick.y -= y;
+		return 0;
 	}
 	printBoard(game);
+	return 1;
 } // }}}
 
 static void rotateBrick(TetrisGame *game, char direction) { // {{{
@@ -226,12 +242,16 @@ static void rotateBrick(TetrisGame *game, char direction) { // {{{
 	printBoard(game);
 } // }}}
 
+static void dropBrick(TetrisGame *game){
+	while(moveBrick(game, 0 ,1));
+}
+
 void processInputs(TetrisGame *game) { // {{{
 	char c = getchar();
 	do {
 		switch (c) {
 			case ' ': moveBrick(game, 0, 1); break;
-			//case '?': dropBrick(game); break;
+			case 'd': dropBrick(game); break;
 			case 'p': pauseUnpause(game); break;
 			case 'q': game->isRunning = 0; break;
 			case 27: // ESC
