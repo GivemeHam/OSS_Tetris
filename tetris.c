@@ -232,13 +232,19 @@ int moveBrick(TetrisGame *game, char x, char y) { // {{{
 	return 1;
 } // }}}
 
+static void changeRotation(TetrisGame *game,char direction){
+	game->brick.rotation = (game->brick.rotation + 4 + direction)%4;
+}
+
 static void rotateBrick(TetrisGame *game, char direction) { // {{{
 	if (game->isPaused) return;
 	unsigned char oldRotation = game->brick.rotation;
-	game->brick.rotation += 4 + direction; // 4: keep it positive
-	game->brick.rotation %= 4;
+	changeRotation(game,direction);
 	if (brickCollides(game))
+	{
 		game->brick.rotation = oldRotation;
+		return ;
+	}
 	printBoard(game);
 } // }}}
 
