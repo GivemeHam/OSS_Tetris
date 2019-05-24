@@ -193,15 +193,17 @@ static void pauseUnpause(TetrisGame *game) { // {{{
 	game->isPaused ^= 1;
 } // }}}
 
-static void moveBrick(TetrisGame *game, char x, char y) { // {{{
+int moveBrick(TetrisGame *game, char x, char y) { // {{{
 	if (game->isPaused) return;
 	game->brick.x += x;
 	game->brick.y += y;
 	if (brickCollides(game)) {
 		game->brick.x -= x;
 		game->brick.y -= y;
+		return 0;
 	}
 	printBoard(game);
+	return 1;
 } // }}}
 
 static void rotateBrick(TetrisGame *game, char direction) { // {{{
@@ -214,12 +216,17 @@ static void rotateBrick(TetrisGame *game, char direction) { // {{{
 	printBoard(game);
 } // }}}
 
+static void dropBrick(TetrisGame *game){
+	while(moveBrick(game, 0 ,1))
+		;
+}
+
 void processInputs(TetrisGame *game) { // {{{
 	char c = getchar();
 	do {
 		switch (c) {
 			case ' ': moveBrick(game, 0, 1); break;
-			//case '?': dropBrick(game); break;
+			case 'd': dropBrick(game); break;
 			case 'p': pauseUnpause(game); break;
 			case 'q': game->isRunning = 0; break;
 			case 27: // ESC
