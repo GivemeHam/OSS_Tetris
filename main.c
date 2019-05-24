@@ -34,7 +34,6 @@ void printBoard(TetrisGame *game) { // {{{
 	line[width * 2] = 0;
 	printf("\e[%iA", game->height + 2); // move to above the board
 	printf("/%s+--------\\\n", line);
-	int foo = 0;
 	for (int y = 0; y < game->height; y++) {
 		printf("|");
 		for (int x = 0; x < game->width; x++) {
@@ -53,7 +52,6 @@ void printBoard(TetrisGame *game) { // {{{
 					char c = colorOfBrickAt(&game->nextBrick, x, y);
 					printf("\e[3%i;4%im  ", c, c);
 				}
-				foo++;
 			}
 			printf("\e[39;49m|\n");
 		}
