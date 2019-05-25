@@ -161,16 +161,21 @@ static char brickCollides(TetrisGame *game) { // {{{
 } // }}}
 
 static void landBrick(TetrisGame *game) { // {{{
+	int cell;
+	int index;
+	int temp;
+	int x,y;
+	
 	if (game->brick.type < 0) return;
-	for (int i = 0; i < 4; i++) {
-		int p = bricks[game->brick.type][game->brick.rotation][i];
-		int x = p % 4 + game->brick.x;
-		int y = p / 4 + game->brick.y;
-		p = x + y * game->width;
-		game->board[p] = game->brick.color;
+	
+	for (cell = 0; cell < 4; cell++) {
+		temp = bricks[game->brick.type][game->brick.rotation][cell];
+		x = temp % 4 + game->brick.x;
+		y = temp / 4 + game->brick.y;
+		index = x + y * game->width;
+		game->board[index] = game->brick.color;
 	}
 } // }}}
-
 static void clearFullRows(TetrisGame *game) { // {{{
 	int width = game->width;
 	int rowsCleared = 0;
