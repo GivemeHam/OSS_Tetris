@@ -56,8 +56,22 @@ static void nextBrick(TetrisGame *game) { // {{{
 	game->brick.y = 0;
 	game->nextBrick.type = rand() % numBrickTypes;
 	game->nextBrick.rotation = rand() % 4;
-	game->nextBrick.color = game->brick.color % 7 + 1; // (color-1 + 1) % 7 + 1, range is 1..7
-	game->nextBrick.x = 0;
+	switch (game->nextBrick.type){
+		case 0 : game->nextBrick.color = 1; 
+			break;
+		case 1 : game->nextBrick.color = 2;
+			break;
+		case 2 : game->nextBrick.color = 3;
+			break;
+		case 3 : game->nextBrick.color = 4;
+			break;
+		case 4 : game->nextBrick.color = 5;
+			break;
+		case 5 : game->nextBrick.color = 6;
+			break;
+		case 6 : game->nextBrick.color = 7;
+			break;
+		}game->nextBrick.x = 0;
 	game->nextBrick.y = 0;
 } // }}}
 
