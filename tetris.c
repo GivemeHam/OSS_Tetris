@@ -74,6 +74,17 @@ static void nextBrick(TetrisGame *game) { // {{{
 		}game->nextBrick.x = 0;
 	game->nextBrick.y = 0;
 } // }}}
+int setLevel(){
+	int level[5] = {500000, 400000, 300000, 200000, 100000};
+	int select_level;
+	while(1){
+		printf("Set Level(1~5): ");
+		select_level = getchar();
+		getchar();
+		if(select_level>=49 && select_level<=53) break;
+	}
+	return level[select_level-49];
+}
 
 TetrisGame *newTetrisGame(unsigned int width, unsigned int height) { // {{{
 	TetrisGame *game = malloc(sizeof(TetrisGame));
@@ -95,7 +106,7 @@ void *initGame(TetrisGame *game){
 	dieIfOutOfMemory(game->board);
 	game->isRunning = 1;
 	game->isPaused  = 0;
-	game->sleepUsec = 500000;
+	game->sleepUsec = setLevel();
 	game->score = 0;
 	nextBrick(game); // fill preview
 	nextBrick(game); // put into game
