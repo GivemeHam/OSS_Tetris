@@ -316,7 +316,8 @@ static void changeRotation(TetrisGame *game,char direction){
 }
 
 static void rotateBrick(TetrisGame *game, char direction) { // {{{
-	if (game->isPaused) return;
+	if (game->isPaused)
+		return 0;
 	unsigned char oldRotation = game->brick.rotation;
 	changeRotation(game,direction);
 	if (brickCollides(game))
