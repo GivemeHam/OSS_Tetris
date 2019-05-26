@@ -243,29 +243,36 @@ static void landBrick(TetrisGame *game) { // {{{
 		game->board[index] = game->brick.color;
 	}
 } // }}}
+
+
 static void clearFullRows(TetrisGame *game) { // {{{
 	int width = game->width;
 	int rowsCleared = 0;
-	for (int y = game->brick.y; y < game->brick.y + 4; y++) {
-		char clearRow = 1;
-		for (int x = 0; x < width; x++) {
+	int clearRow;
+	int x;
+	int y;
+	int row;
+	
+	for (y = game->brick.y; y < game->brick.y + 4; y++) {
+		clearRow = 1;
+		for (x = 0; x < width; x++) {
 			if (0 == game->board[x + y * width]) {
 				clearRow = 0;
 				break;
 			}
 		}
 		if (clearRow) {
-			for (int d = y; d > 0; d--)
-				memcpy(game->board + width*d, game->board + width*(d-1), width);
-			bzero(game->board, width); // delete first line
-			y--;
+			for (row = y; row > 0; row--)
+				memcpy(game->board + width*row, game->board + width*(row-1), width);
+			
+			memset(game->board,0,width);//instead bzero
 			rowsCleared++;
 		}
 	}
 	if (rowsCleared > 0) {
 		// apply score: 0, 1, 3, 5, 8
 		game->score += rowsCleared * 2 - 1;
-		if (rowsCleared >= 4) game->score++;
+		if (rowsCleared == 4) game->score++;
 	}
 } // }}}
 
