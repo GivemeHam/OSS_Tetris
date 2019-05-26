@@ -146,15 +146,46 @@ unsigned char colorOfBrickAt(FallingBrick *brick, int x, int y) { // {{{
 	return 0;
 } // }}}
 
+
+int particleToX(int p, int x){
+	int particle = p % 4 + x;
+	return particle;
+}
+
+int particleToY(int p, int y){
+	int particle = p / 4 + y;
+	return particle;
+}
+
+int xyTogameboard(int x, int y, int width){
+	int rst = x + y * width;
+	return rst;
+}
+
+int isOverlap(int particle, TetrisGame *game){
+	if(particle < 0)
+		return 0;
+	if(particle >= game->size)
+		return 0;
+	if(game->board[particle] == 0)
+		return 0;
+	return 1;
+}
+
+
 static char brickCollides(TetrisGame *game) { // {{{
 	for (int i = 0; i < 4; i++) {
-		int p = bricks[game->brick.type][game->brick.rotation][i];
-		int x = p % 4 + game->brick.x;
-		if (x < 0 || x >= game->width) return 1;
-		int y = p / 4 + game->brick.y;
-		if (y >= game->height) return 1;
-		p = x + y * game->width;
-		if (p >= 0 && p < game->size && game->board[p] != 0)
+		int particle = bricks[game->brick.type][game->brick.rotation][i];
+		int x = particleToX(particle , game->brick.x);
+		if (x < 0 || x >= game->width)
+			return 1;
+
+		int y = particleToY(particle, game->brick.y);
+		if (y >= game->height)
+			return 1;
+
+		particle = xyTogameboard(x,y,game->width);
+		if (isOverlap(particle,game))
 			return 1;
 	}
 	return 0;
@@ -244,13 +275,19 @@ int moveBrick(TetrisGame *game, char x, char y) { // {{{
 	return 1;
 } // }}}
 
+static void changeRotation(TetrisGame *game,char direction){
+	game->brick.rotation = (game->brick.rotation + 4 + direction)%4;
+}
+
 static void rotateBrick(TetrisGame *game, char direction) { // {{{
 	if (game->isPaused) return;
 	unsigned char oldRotation = game->brick.rotation;
-	game->brick.rotation += 4 + direction; // 4: keep it positive
-	game->brick.rotation %= 4;
+	changeRotation(game,direction);
 	if (brickCollides(game))
+	{
 		game->brick.rotation = oldRotation;
+		return ;
+	}
 	printBoard(game);
 } // }}}
 
