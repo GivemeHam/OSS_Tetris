@@ -71,7 +71,9 @@ static void nextBrick(TetrisGame *game) { // {{{
 			break;
 		case 6 : game->nextBrick.color = 7;
 			break;
-		}game->nextBrick.x = 0;
+		default : return ;
+		}
+	game->nextBrick.x = 0;
 	game->nextBrick.y = 0;
 } // }}}
 
@@ -206,10 +208,10 @@ static void landBrick(TetrisGame *game) { // {{{
 		index = x + y * game->width;
 		game->board[index] = game->brick.color;
 	}
-} // }}}
+} 
 
 
-static void clearFullRows(TetrisGame *game) { // {{{
+static void clearFullRows(TetrisGame *game) { 
 	int width = game->width;
 	int rowsCleared = 0;
 	int clearRow;
@@ -238,10 +240,11 @@ static void clearFullRows(TetrisGame *game) { // {{{
 		game->score += rowsCleared * 2 - 1;
 		if (rowsCleared == 4) game->score++;
 	}
-} // }}}
+} 
 
-void tick(TetrisGame *game) { // {{{
+void tick(TetrisGame *game) { 
 	if (game->isPaused) return;
+
 	game->brick.y++;
 	if (brickCollides(game)) {
 		game->brick.y--;
@@ -251,18 +254,19 @@ void tick(TetrisGame *game) { // {{{
 		if (brickCollides(game))
 			game->isRunning = 0;
 	}
-	printBoard(game);
-} // }}}
 
-static void pauseUnpause(TetrisGame *game) { // {{{
+	printBoard(game);
+} 
+
+static void pauseUnpause(TetrisGame *game) { 
 	if (game->isPaused) {
 		// TODO de-/reactivate timer
 		tick(game);
 	}
 	game->isPaused ^= 1;
-} // }}}
+}
 
-int moveBrick(TetrisGame *game, char x, char y) { // {{{
+int moveBrick(TetrisGame *game, char x, char y) { 
 	if (game->isPaused) return;
 	game->brick.x += x;
 	game->brick.y += y;
@@ -273,13 +277,13 @@ int moveBrick(TetrisGame *game, char x, char y) { // {{{
 	}
 	printBoard(game);
 	return 1;
-} // }}}
+} 
 
 static void changeRotation(TetrisGame *game,char direction){
 	game->brick.rotation = (game->brick.rotation + 4 + direction)%4;
 }
 
-static void rotateBrick(TetrisGame *game, char direction) { // {{{
+static void rotateBrick(TetrisGame *game, char direction) { 
 	if (game->isPaused) return;
 	unsigned char oldRotation = game->brick.rotation;
 	changeRotation(game,direction);
