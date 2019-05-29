@@ -21,7 +21,7 @@
 
 typedef struct { // FallingBrick {{{
 	unsigned char type, rotation, color;
-	int x, y;
+	unsigned int x, y;
 } FallingBrick; // }}}
 
 typedef struct { // TetrisGame {{{
