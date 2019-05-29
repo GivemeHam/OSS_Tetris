@@ -56,26 +56,66 @@ static void nextBrick(TetrisGame *game) { // {{{
 	game->brick.y = 0;
 	game->nextBrick.type = rand() % numBrickTypes;
 	game->nextBrick.rotation = rand() % 4;
-	game->nextBrick.color = game->brick.color % 7 + 1; // (color-1 + 1) % 7 + 1, range is 1..7
-	game->nextBrick.x = 0;
+	switch (game->nextBrick.type){
+		case 0 : game->nextBrick.color = 1; 
+			break;
+		case 1 : game->nextBrick.color = 2;
+			break;
+		case 2 : game->nextBrick.color = 3;
+			break;
+		case 3 : game->nextBrick.color = 4;
+			break;
+		case 4 : game->nextBrick.color = 5;
+			break;
+		case 5 : game->nextBrick.color = 6;
+			break;
+		case 6 : game->nextBrick.color = 7;
+			break;
+		}game->nextBrick.x = 0;
 	game->nextBrick.y = 0;
 } // }}}
+int setLevel(){
+	int level[5] = {500000, 400000, 300000, 200000, 100000};
+	int select_level = 0;
+	while(1){	
+		printf("Set Level(1~5): ");
+		scanf("%d",&select_level);
+		if(select_level<1 || select_level>5) {
+			printf("[!!!]Insert 1-5\n");
+			getchar();
+		}
+		else break;
+	}
+	return level[select_level-1];
+}
 
 TetrisGame *newTetrisGame(unsigned int width, unsigned int height) { // {{{
 	TetrisGame *game = malloc(sizeof(TetrisGame));
+	initGame(game);
+	// init terminal for non-blocking and no-echo getchar()
+	initTerm(game);
+	// init signals for timer and errors
+	initSig();
+	// init timer
+	initTimer(game);
+	return game;
+} // }}}
+void *initGame(TetrisGame *game){
 	dieIfOutOfMemory(game);
-	game->width = width;
-	game->height = height;
-	game->size = width * height;
+	game->width = 10;
+	game->height = 20;
+	game->size = game->width * game->height;
 	game->board = calloc(game->size, sizeof(char));
 	dieIfOutOfMemory(game->board);
 	game->isRunning = 1;
 	game->isPaused  = 0;
-	game->sleepUsec = 500000;
+	game->sleepUsec = setLevel();
 	game->score = 0;
 	nextBrick(game); // fill preview
 	nextBrick(game); // put into game
-	// init terminal for non-blocking and no-echo getchar()
+}
+
+void initTerm(TetrisGame *game){
 	struct termios term;
 	tcgetattr(STDIN_FILENO, &game->termOrig);
 	tcgetattr(STDIN_FILENO, &term);
@@ -83,7 +123,8 @@ TetrisGame *newTetrisGame(unsigned int width, unsigned int height) { // {{{
 	term.c_cc[VTIME] = 0;
 	term.c_cc[VMIN] = 0;
 	tcsetattr(STDIN_FILENO, TCSANOW, &term);
-	// init signals for timer and errors
+}
+void initSig(){
 	struct sigaction signalAction;
 	sigemptyset(&signalAction.sa_mask);
 	signalAction.sa_handler = signalHandler;
@@ -92,12 +133,11 @@ TetrisGame *newTetrisGame(unsigned int width, unsigned int height) { // {{{
 	sigaction(SIGTERM, &signalAction, NULL);
 	sigaction(SIGSEGV, &signalAction, NULL);
 	sigaction(SIGALRM, &signalAction, NULL);
-	// init timer
+}
+void initTimer(TetrisGame *game){
 	game->timer.it_value.tv_usec = game->sleepUsec;
 	setitimer(ITIMER_REAL, &game->timer, NULL);
-	return game;
-} // }}}
-
+}
 void destroyTetrisGame(TetrisGame *game) { // {{{
 	if (game == NULL) return;
 	tcsetattr(STDIN_FILENO, TCSANOW, &game->termOrig);
@@ -217,8 +257,7 @@ static void rotateBrick(TetrisGame *game, char direction) { // {{{
 } // }}}
 
 static void dropBrick(TetrisGame *game){
-	while(moveBrick(game, 0 ,1))
-		;
+	while(moveBrick(game, 0 ,1));
 }
 
 void processInputs(TetrisGame *game) { // {{{
