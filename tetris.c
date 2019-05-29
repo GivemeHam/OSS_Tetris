@@ -194,10 +194,10 @@ static char brickCollides(TetrisGame *game) { // {{{
 } // }}}
 
 static void landBrick(TetrisGame *game) { // {{{
-	int cell;
-	int index;
-	int temp;
-	int x,y;
+	unsigned int cell;
+	unsigned int index;
+	unsigned int temp;
+	unsigned int x,y;
 	
 	if (game->brick.type < 0) return;
 	
@@ -212,12 +212,12 @@ static void landBrick(TetrisGame *game) { // {{{
 
 
 static void clearFullRows(TetrisGame *game) { 
-	int width = game->width;
-	int rowsCleared = 0;
-	int clearRow;
-	int x;
-	int y;
-	int row;
+	unsigned int width = game->width;
+	unsigned int rowsCleared = 0;
+	unsigned int clearRow;
+	unsigned int x;
+	unsigned int y;
+	unsigned int row;
 	
 	for (y = game->brick.y; y < game->brick.y + 4; y++) {
 		clearRow = 1;
