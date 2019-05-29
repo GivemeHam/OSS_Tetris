@@ -110,13 +110,22 @@ int main(int argc, char **argv) { // {{{
 	return 0;
 } // }}}
 void playGame(){
-	game = newTetrisGame();
-	// create space for the board
-	for (int i = 0; i < game->height + 2; i++) printf("\n");
-	printBoard(game);
-	while (game->isRunning) {
-		usleep(50000);
-		processInputs(game);
+	while(1){
+		game = newTetrisGame();
+		// create space for the board
+		for (int i = 0; i < game->height + 2; i++) printf("\n");
+		printBoard(game);
+		while (game->isRunning) {
+			usleep(50000);
+			processInputs(game);
+		}
+		game->sleepUsec = 0;
+		sleep(3000);
+		destroyTetrisGame(game);
+		printf("replay? (y/n) :");
+		char replay = getchar();
+		if(replay == 'y') continue;
+		else break;
 	}
-	destroyTetrisGame(game);
+		
 }
