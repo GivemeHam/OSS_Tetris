@@ -226,9 +226,9 @@ void processInputs(TetrisGame *game) { // {{{
 	do {
 		switch (c) {
 			case ' ': moveBrick(game, 0, 1); break;
-			case 'd': dropBrick(game); break;
-			case 'p': pauseUnpause(game); break;
-			case 'q': game->isRunning = 0; break;
+			case 'd': case 'D': dropBrick(game); break;
+			case 'p': case 'P': pauseUnpause(game); break;
+			case 'q': case 'Q': game->isRunning = 0; break;
 			case 27: // ESC
 				getchar();
 				switch (getchar()) {
