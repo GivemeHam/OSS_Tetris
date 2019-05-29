@@ -135,14 +135,50 @@ void destroyTetrisGame(TetrisGame *game) { // {{{
 	free(game);
 } // }}}
 
+int xyToBrickXY(int brickXY, int xy){
+	int rst = xy - brickXY;
+	return rst;
+}
+
+int isOutBrick(int location)
+{
+	if(location < 0 )
+		return 1;
+	else if (location >= 4 )
+		return 1;
+	else
+		return 0;
+}
+
+int xyToBricklocation(int x,int y){
+	int rst = x + 4*y ;
+	return rst;
+}
+
+int isBrickParticle(FallingBrick *brick, int location,int i){
+	if (location == bricks[brick->type][brick->rotation][i])
+		return 1;
+	else
+		return 0;
+}
+
 unsigned char colorOfBrickAt(FallingBrick *brick, int x, int y) { // {{{
-	if (brick->type < 0) return 0;
-	int v = y - brick->y;
-	if (v < 0 || v >= 4) return 0;
-	int u = x - brick->x;
-	if (u < 0 || u >= 4) return 0;
+	int brickXY = 0;
+	
+	if (brick->type < 0)
+		return 0;
+
+	int brickY = xyToBrickXY(brick->y, y);
+	if (isOutBrick(brickY))
+		return 0;
+
+	int brickX = xyToBrickXY(brick->x, x);
+	if (isOutBrick(brickX))
+		return 0;
+
+	brickXY = xyToBricklocation(brickX, brickY);
 	for (int i = 0; i < 4; i++) {
-		if (u + 4*v == bricks[brick->type][brick->rotation][i])
+		if (isBrickParticle(brick, brickXY, i))
 			return brick->color;
 	}
 	return 0;
@@ -307,16 +343,19 @@ void processInputs(TetrisGame *game) { // {{{
 			case 'd': dropBrick(game); break;
 			case 'p': pauseUnpause(game); break;
 			case 'q': game->isRunning = 0; break;
-			case 27: // ESC
+			case 27:// ESC
 				getchar();
 				switch (getchar()) {
 					case 'A': rotateBrick(game,  1);  break; // up
 					case 'B': rotateBrick(game, -1);  break; // down
 					case 'C': moveBrick(game,  1, 0); break; // right
 					case 'D': moveBrick(game, -1, 0); break; // left
-				}
+					default: break;
+				}	
 				break;
+			default:  break;
 		}
-	} while ((c = getchar()) != -1);
+		c = getchar();
+	} while (c != -1);
 } // }}}
 
