@@ -28,33 +28,36 @@
 TetrisGame *game;
 
 void printBoard(TetrisGame *game) { // {{{
-	int width = game->width;
-	char line[width * 2 + 1];
-	memset(line, '-', width * 2);
-	line[width * 2] = 0;
+	char line[game->width * 2 + 1];
+	memset(line, '-', game->width * 2);
+	line[game->width * 2] = 0;
 	printf("\e[%iA", game->height + 2); // move to above the board
 	printf("/%s+--------\\\n", line);
 	for (int y = 0; y < game->height; y++) {
 		printf("|");
 		for (int x = 0; x < game->width; x++) {
-			char c = game->board[x + y * game->width];
-			if (c == 0) // empty? try falling brick
-				c = colorOfBrickAt(&game->brick, x, y);
-			printf("\e[3%i;4%im  ", c, c);
+			char color = game->board[x + y * game->width];
+			if (color == 0) // empty? try falling brick
+				color = colorOfBrickAt(&game->brick, x, y);
+			printf("\e[3%i;4%im  ", color, color);
 		}
-		if (y == 4) printf("\e[39;49m|  \e[1mScore\e[0m |\n");
-		else if (y == 5) printf("\e[39;49m| %6i |\n", game->score);
-		else if (y == 6) printf("\e[39;49m+--------/\n");
-		else {
-			if (y < 4) {
-				printf("\e[39;49m|");
-				for (int x = 0; x < 4; x++) {
-					char c = colorOfBrickAt(&game->nextBrick, x, y);
-					printf("\e[3%i;4%im  ", c, c);
-				}
+		if (y <= 6 )
+		{
+			switch(y){
+				case 4: printf("\e[39;49m|  \e[1mScore\e[0m |\n"); break;
+				case 5: printf("\e[39;49m| %6i |\n", game->score); break;
+				case 6: printf("\e[39;49m+--------/\n"); break;
+				default: 
+					printf("\e[39;49m|");
+					for (int x = 0; x < 4; x++) {
+						char color = colorOfBrickAt(&game->nextBrick, x, y);
+						printf("\e[3%i;4%im  ", color, color);
+					}
+					printf("\e[39;49m|\n");
 			}
-			printf("\e[39;49m|\n");
 		}
+		else
+			printf("\e[39;49m|\n");
 	}
 	printf("\\%s/\n", line);
 } // }}}
