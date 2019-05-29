@@ -42,19 +42,23 @@ void printBoard(TetrisGame *game) { // {{{
 				c = colorOfBrickAt(&game->brick, x, y);
 			printf("\e[3%i;4%im  ", c, c);
 		}
-		if (y == 4) printf("\e[39;49m|  \e[1mScore\e[0m |\n");
-		else if (y == 5) printf("\e[39;49m| %6i |\n", game->score);
-		else if (y == 6) printf("\e[39;49m+--------/\n");
-		else {
-			if (y < 4) {
-				printf("\e[39;49m|");
-				for (int x = 0; x < 4; x++) {
-					char c = colorOfBrickAt(&game->nextBrick, x, y);
-					printf("\e[3%i;4%im  ", c, c);
-				}
+		if (y <= 6 )
+		{
+			switch(y){
+				case 4: printf("\e[39;49m|  \e[1mScore\e[0m |\n"); break;
+				case 5: printf("\e[39;49m| %6i |\n", game->score); break;
+				case 6: printf("\e[39;49m+--------/\n"); break;
+				default: 
+					printf("\e[39;49m|");
+					for (int x = 0; x < 4; x++) {
+						char c = colorOfBrickAt(&game->nextBrick, x, y);
+						printf("\e[3%i;4%im  ", c, c);
+					}
+					printf("\e[39;49m|\n");
 			}
-			printf("\e[39;49m|\n");
 		}
+		else
+			printf("\e[39;49m|\n");
 	}
 	printf("\\%s/\n", line);
 } // }}}
