@@ -54,6 +54,7 @@ static void nextBrick(TetrisGame *game) { // {{{
 	game->brick = game->nextBrick;
 	game->brick.x = game->width/2 - 2;
 	game->brick.y = 0;
+	srand(time(NULL));
 	game->nextBrick.type = rand() % numBrickTypes;
 	game->nextBrick.rotation = rand() % 4;
 	switch (game->nextBrick.type){
