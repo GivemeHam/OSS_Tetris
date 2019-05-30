@@ -189,7 +189,7 @@ unsigned char colorOfBrickAt(FallingBrick *brick,unsigned int x,unsigned int y) 
 	if (isOutBrick(brickY))
 		return 0;
 
-	int brickX = xyToBrickXY(brick->x, x);
+	brickX = xyToBrickXY(brick->x, x);
 	if (isOutBrick(brickX))
 		return 0;
 
