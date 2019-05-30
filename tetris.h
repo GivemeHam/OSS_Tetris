@@ -18,10 +18,11 @@
 
 #include <termios.h>
 #include <sys/time.h>
+#include <time.h>
 
 typedef struct { // FallingBrick {{{
-	unsigned char type, rotation, color;
-	int x, y;
+	unsigned int type, rotation, color;
+	unsigned int x, y;
 } FallingBrick; // }}}
 
 typedef struct { // TetrisGame {{{
@@ -38,6 +39,7 @@ typedef struct { // TetrisGame {{{
 extern void signalHandler(int signal);
 extern void printBoard(TetrisGame *game);
 extern void playGame();
+extern int replay();
 
 TetrisGame *newTetrisGame();
 void *initGame(TetrisGame *game);
