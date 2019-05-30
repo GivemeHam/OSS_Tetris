@@ -283,9 +283,9 @@ static void clearFullRows(TetrisGame *game) {
 		}
 		if (clearRow) {
 			for (row = y; row > 0; row--)
-				memcpy(game->board + width*row, game->board + width*(row-1), width);
+				memcpy(game->board + width*row, game->board + width*(row-1), width*sizeof(unsigned int));
 			
-			memset(game->board,0,width);//instead bzero
+			memset(game->board,0,width*sizeof(unsigned int));//instead bzero
 			rowsCleared++;
 		}
 	}
