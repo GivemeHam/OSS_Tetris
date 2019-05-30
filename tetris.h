@@ -27,7 +27,7 @@ typedef struct { // FallingBrick {{{
 
 typedef struct { // TetrisGame {{{
 	unsigned int width, height, size; // of the board
-	unsigned char *board; // indices of pattern
+	unsigned int *board; // indices of pattern
 	FallingBrick brick, nextBrick;
 	unsigned char isRunning, isPaused;
 	suseconds_t sleepUsec;
@@ -42,7 +42,7 @@ extern void playGame();
 extern int replay();
 
 TetrisGame *newTetrisGame();
-void *initGame(TetrisGame *game);
+void initGame(TetrisGame *game);
 void initTerm(TetrisGame *game);
 void initSig();
 void initTimer(TetrisGame *game);
@@ -50,7 +50,7 @@ void initTimer(TetrisGame *game);
 void destroyTetrisGame(TetrisGame *game);
 void processInputs(TetrisGame *game);
 void tick(TetrisGame *game);
-unsigned char colorOfBrickAt(FallingBrick *brick,unsigned int x,unsigned int y);
+unsigned int colorOfBrickAt(FallingBrick *brick,unsigned int x,unsigned int y);
 
 //Added functions
 unsigned int xyToBrickXY(unsigned int brickXY,unsigned int xy);
@@ -61,4 +61,4 @@ unsigned int particleToX(unsigned int p,unsigned int x);
 unsigned int particleToY(unsigned int p,unsigned int y);
 unsigned int xyTogameboard(unsigned int x,unsigned int y,unsigned int width);
 unsigned int isOverlap(unsigned int particle, TetrisGame *game);
-void changeRotation(TetrisGame * game,char direction);
+void changeRotation(TetrisGame * game,unsigned int direction);
