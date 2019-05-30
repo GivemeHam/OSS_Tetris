@@ -18,9 +18,10 @@
 
 #include <termios.h>
 #include <sys/time.h>
+#include <time.h>
 
 typedef struct { // FallingBrick {{{
-	unsigned char type, rotation, color;
+	unsigned int type, rotation, color;
 	unsigned int x, y;
 } FallingBrick; // }}}
 
