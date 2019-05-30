@@ -28,6 +28,7 @@
 TetrisGame *game;
 
 void printBoard(TetrisGame *game) { // {{{
+	char color = '\0';
 	char line[game->width * 2 + 1];
 	memset(line, '-', game->width * 2);
 	line[game->width * 2] = 0;
@@ -36,7 +37,7 @@ void printBoard(TetrisGame *game) { // {{{
 	for (unsigned int y = 0; y < game->height; y++) {
 		printf("|");
 		for (unsigned int x = 0; x < game->width; x++) {
-			char color = game->board[x + y * game->width];
+			color = game->board[x + y * game->width];
 			if (color == 0) // empty? try falling brick
 				color = colorOfBrickAt(&game->brick, x, y);
 			printf("\e[3%i;4%im  ", color, color);
@@ -50,7 +51,7 @@ void printBoard(TetrisGame *game) { // {{{
 				default: 
 					printf("\e[39;49m|");
 					for (unsigned int x = 0; x < 4; x++) {
-						char color = colorOfBrickAt(&game->nextBrick, x, y);
+						color = colorOfBrickAt(&game->nextBrick, x, y);
 						printf("\e[3%i;4%im  ", color, color);
 					}
 					printf("\e[39;49m|\n");

@@ -179,15 +179,17 @@ unsigned int isBrickParticle(FallingBrick *brick,unsigned int location,unsigned 
 
 unsigned char colorOfBrickAt(FallingBrick *brick,unsigned int x,unsigned int y) { // {{{
 	unsigned int brickXY = 0;
-	
+	unsigned int brickY;
+	unsigned int brickX;
+
 	if (brick->type < 0)
 		return 0;
 
-	unsigned int brickY = xyToBrickXY(brick->y, y);
+	brickY = xyToBrickXY(brick->y, y);
 	if (isOutBrick(brickY))
 		return 0;
 
-	unsigned int brickX = xyToBrickXY(brick->x, x);
+	int brickX = xyToBrickXY(brick->x, x);
 	if (isOutBrick(brickX))
 		return 0;
 
@@ -229,11 +231,12 @@ unsigned int isOverlap(unsigned int particle, TetrisGame *game){
 char brickCollides(TetrisGame *game) { // {{{
 	for (int i = 0; i < 4; i++) {
 		unsigned int particle = bricks[game->brick.type][game->brick.rotation][i];
+		unsigned int y = 0;
 		unsigned int x = particleToX(particle , game->brick.x);
 		if (x < 0 || x >= game->width)
 			return 1;
 
-		unsigned int y = particleToY(particle, game->brick.y);
+		y = particleToY(particle, game->brick.y);
 		if (y >= game->height)
 			return 1;
 
@@ -334,9 +337,9 @@ void changeRotation(TetrisGame *game,char direction){
 	game->brick.rotation = (game->brick.rotation + 4 + direction)%4;
 }
 void rotateBrick(TetrisGame *game, char direction) { // {{{
+	unsigned char oldRotation = game->brick.rotation;
 	if (game->isPaused)
 		return 0;
-	unsigned char oldRotation = game->brick.rotation;
 	changeRotation(game,direction);
 	if (brickCollides(game))
 	{
