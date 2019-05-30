@@ -28,10 +28,9 @@
 TetrisGame *game;
 
 void printBoard(TetrisGame *game) { // {{{
-	int width = game->width;
-	char line[width * 2 + 1];
-	memset(line, '-', width * 2);
-	line[width * 2] = 0;
+	char line[game->width * 2 + 1];
+	memset(line, '-', game->width * 2);
+	line[game->width * 2] = 0;
 	printf("\e[%iA", game->height + 2); // move to above the board
 	printf("/%s+--------\\\n", line);
 	for (int y = 0; y < game->height; y++) {
