@@ -132,7 +132,7 @@ void playGame(){
 }
 int replay(){
 	char replay = 'y';
-	char c='\0';
+	int c='\0';
 	while(1){
 		printf("replay? (y/n) :");
 		scanf("%c", &replay);
