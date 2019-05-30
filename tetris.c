@@ -76,6 +76,20 @@ static void nextBrick(TetrisGame *game) { // {{{
 	game->nextBrick.x = 0;
 	game->nextBrick.y = 0;
 } // }}}
+int setLevel(){
+	int level[5] = {500000, 400000, 300000, 200000, 100000};
+	int select_level = 0;
+	while(1){	
+		printf("Set Level(1~5): ");
+		scanf("%d",&select_level);
+		if(select_level<1 || select_level>5) {
+			printf("[!!!]Insert 1-5\n");
+			getchar();
+		}
+		else break;
+	}
+	return level[select_level-1];
+}
 
 TetrisGame *newTetrisGame(unsigned int width, unsigned int height) { // {{{
 	TetrisGame *game = malloc(sizeof(TetrisGame));
@@ -97,7 +111,7 @@ void *initGame(TetrisGame *game){
 	dieIfOutOfMemory(game->board);
 	game->isRunning = 1;
 	game->isPaused  = 0;
-	game->sleepUsec = 500000;
+	game->sleepUsec = setLevel();
 	game->score = 0;
 	nextBrick(game); // fill preview
 	nextBrick(game); // put into game
@@ -340,10 +354,10 @@ void processInputs(TetrisGame *game) { // {{{
 	do {
 		switch (c) {
 			case ' ': moveBrick(game, 0, 1); break;
-			case 'd': dropBrick(game); break;
-			case 'p': pauseUnpause(game); break;
-			case 'q': game->isRunning = 0; break;
-			case 27:// ESC
+			case 'd': case 'D': dropBrick(game); break;
+			case 'p': case 'P': pauseUnpause(game); break;
+			case 'q': case 'Q': game->isRunning = 0; break;
+			case 27: // ESC
 				getchar();
 				switch (getchar()) {
 					case 'A': rotateBrick(game,  1);  break; // up

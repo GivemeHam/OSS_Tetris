@@ -101,20 +101,38 @@ void signalHandler(int signal) { // {{{
 	return;
 } // }}}
 
-int main(int argc, char **argv) { // {{{
+int main(int  argc, char **argv) { // {{{
 	srand(time(0));
 	welcome();
 	playGame();
 	return 0;
 } // }}}
 void playGame(){
-	game = newTetrisGame();
-	// create space for the board
-	for (int i = 0; i < game->height + 2; i++) printf("\n");
-	printBoard(game);
-	while (game->isRunning) {
-		usleep(50000);
-		processInputs(game);
+	while(1){
+		game =  newTetrisGame();
+		// create space for the board
+		for (int i = 0; i < game->height + 2; i++) printf("\n");
+		printBoard(game);
+		while (game->isRunning) {
+			usleep(50000);
+			processInputs(game);
+		}
+		game->sleepUsec = 0;
+		sleep(3000);
+		destroyTetrisGame(game);
+	
+		if(replay()) continue;
+		else break;
 	}
-	destroyTetrisGame(game);
+}
+int replay(){
+	char replay = 'y';
+	while(1){
+		printf("replay? (y/n) :");
+		scanf("%c", &replay);
+		if(replay == 'y' || replay == 'n') break;
+		printf("Insert Only 'y' or 'n'\n");
+	}	
+	if(replay == 'y') return 1;
+	else return 0;
 }
