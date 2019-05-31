@@ -80,12 +80,15 @@ static void nextBrick(TetrisGame *game) { // {{{
 int setLevel(){
 	int level[5] = {500000, 400000, 300000, 200000, 100000};
 	int select_level = 0;
+	char c='\0';
+
 	while(1){	
 		printf("Set Level(1~5): ");
 		scanf("%d",&select_level);
+		c=getchar();
+		while(c != '\n') c=getchar();
 		if(select_level<1 || select_level>5) {
 			printf("[!!!]Insert 1-5\n");
-			getchar();
 		}
 		else break;
 	}
