@@ -135,7 +135,7 @@ int replay(){
 		printf("replay? (y/n) :");
 		scanf("%c", &replay);
 		if(replay == 'y' || replay == 'n'
-			||replay == 'Y' || replay 'N') break;
+			|| replay == 'Y' || replay == 'N') break;
 		printf("Insert Only 'y' or 'n'\n");
 	}	
 	if(replay == 'y' || replay =='Y') return 1;
