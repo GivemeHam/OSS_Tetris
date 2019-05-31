@@ -1,28 +1,4 @@
-/* tetris-term - Classic Tetris for your terminal.
- *
- * Copyright (C) 2014 Gjum
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 #include "tetris.h"
-
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
 
 // {{{ bricks
 #define numBrickTypes 7
@@ -43,14 +19,44 @@ const unsigned char bricks[numBrickTypes][4][4] = {
 };
 // }}}
 
-static void dieIfOutOfMemory(void *pointer) { // {{{
-	if (pointer == NULL) {
-		printf("Error: Out of memory\n");
-		exit(1);
+void printBoard(TetrisGame *game) { // {{{
+	unsigned int color = 0;
+	char line[game->width * 2 + 1];
+	memset(line, '-', game->width * 2);
+	line[game->width * 2] = 0;
+	printf("\e[%iA", game->height + 2); // move to above the board
+	printf("/%s+--------\\\n", line);
+	for (unsigned int y = 0; y < game->height; y++) {
+		printf("|");
+		for (unsigned int x = 0; x < game->width; x++) {
+			color = game->board[x + y * game->width];
+			if (color == 0) // empty? try falling brick
+				color = colorOfBrickAt(&game->brick, x, y);
+			printf("\e[3%i;4%im  ", color, color);
+		}
+		if (y <= 6 )
+		{
+			switch(y){
+				case 4: printf("\e[39;49m|  \e[1mScore\e[0m |\n"); break;
+				case 5: printf("\e[39;49m| %6li |\n", game->score); break;
+				case 6: printf("\e[39;49m+--------/\n"); break;
+				default: 
+					printf("\e[39;49m|");
+					for (unsigned int x = 0; x < 4; x++) {
+						color = colorOfBrickAt(&game->nextBrick, x, y);
+						printf("\e[3%i;4%im  ", color, color);
+					}
+					printf("\e[39;49m|\n");
+			}
+		}
+		else
+			printf("\e[39;49m|\n");
 	}
+	printf("\\%s/\n", line);
 } // }}}
 
-static void nextBrick(TetrisGame *game) { // {{{
+
+void nextBrick(TetrisGame *game) { // {{{
 	game->brick = game->nextBrick;
 	game->brick.x = game->width/2 - 2;
 	game->brick.y = 0;
@@ -77,98 +83,7 @@ static void nextBrick(TetrisGame *game) { // {{{
 	game->nextBrick.x = 0;
 	game->nextBrick.y = 0;
 } // }}}
-int setLevel(){
-	int level[5] = {500000, 400000, 300000, 200000, 100000};
-	int select_level = 0;
-	int c='\0';
 
-	while(1){	
-		printf("Set Level(1~5): ");
-		scanf("%d",&select_level);
-		c=getchar();
-		while(c != '\n') c=getchar();
-		if(select_level<1 || select_level>5) {
-			printf("[!!!]Insert 1-5\n");
-		}
-		else break;
-	}
-	return level[select_level-1];
-}
-
-TetrisGame *newTetrisGame(unsigned int width, unsigned int height) { // {{{
-	TetrisGame *game = malloc(sizeof(TetrisGame));
-	initGame(game);
-	// init terminal for non-blocking and no-echo getchar()
-	initTerm(game);
-	// init signals for timer and errors
-	initSig();
-	// init timer
-	initTimer(game);
-	return game;
-} // }}}
-void sigException(int errValue){
-	if(errValue == -1){
-		perror("Fail sigAction!\n");
-		sleep(3);
-		return;
-	}
-	else return;
-}
-
-void termException(int errValue){
-	if(errValue == -1){
-		perror("Fail termSetting!\n");
-		sleep(3);
-		return;
-	}
-	else return;
-}
-void initGame(TetrisGame *game){
-	dieIfOutOfMemory(game);
-	game->width = 10;
-	game->height = 20;
-	game->size = (game->width) * (game->height);
-	game->board = calloc(game->size, sizeof(int));
-	dieIfOutOfMemory(game->board);
-	game->isRunning = 1;
-	game->isPaused  = 0;
-	game->sleepUsec = setLevel();
-	game->score = 0;
-	nextBrick(game); // fill preview
-	nextBrick(game); // put into game
-}
-
-void initTerm(TetrisGame *game){
-	struct termios term;
-	termException(tcgetattr(STDIN_FILENO, &game->termOrig));
-	termException(tcgetattr(STDIN_FILENO, &term));
-	term.c_lflag &= ~(ICANON|ECHO);
-	term.c_cc[VTIME] = 0;
-	term.c_cc[VMIN] = 0;
-	termException(tcsetattr(STDIN_FILENO, TCSANOW, &term));
-}
-void initSig(){
-	struct sigaction signalAction;
-	sigemptyset(&signalAction.sa_mask);
-	signalAction.sa_handler = signalHandler;
-	signalAction.sa_flags = 0;
-	sigException(sigaction(SIGINT,  &signalAction, NULL));
-	sigException(sigaction(SIGTERM, &signalAction, NULL));
-	sigException(sigaction(SIGSEGV, &signalAction, NULL));
-	sigException(sigaction(SIGALRM, &signalAction, NULL));
-}
-void initTimer(TetrisGame *game){
-	game->timer.it_value.tv_usec = game->sleepUsec;
-	setitimer(ITIMER_REAL, &game->timer, NULL);
-}
-void destroyTetrisGame(TetrisGame *game) { // {{{
-	if (game == NULL) return;
-	tcsetattr(STDIN_FILENO, TCSANOW, &game->termOrig);
-	printf("Your score: %li\n", game->score);
-	printf("Game over.\n");
-	free(game->board);
-	free(game);
-} // }}}
 
 unsigned int xyToBrickXY(unsigned int brickXY,unsigned int xy){
 	unsigned int rst = xy - brickXY;
@@ -267,7 +182,7 @@ unsigned int brickCollides(TetrisGame *game) { // {{{
 	return 0;
 } // }}}
 
-static void landBrick(TetrisGame *game) { // {{{
+void landBrick(TetrisGame *game) { // {{{
 	unsigned int cell;
 	unsigned int index;
 	unsigned int temp;
@@ -285,7 +200,7 @@ static void landBrick(TetrisGame *game) { // {{{
 } 
 
 
-static void clearFullRows(TetrisGame *game) { 
+void clearFullRows(TetrisGame *game) { 
 	unsigned int width = game->width;
 	unsigned int rowsCleared = 0;
 	unsigned int clearRow;
@@ -333,13 +248,6 @@ void tick(TetrisGame *game) {
 	printBoard(game);
 } 
 
-static void pauseUnpause(TetrisGame *game) { 
-	if (game->isPaused) {
-		// TODO de-/reactivate timer
-		tick(game);
-	}
-	game->isPaused ^= 1;
-}
 
 unsigned int moveBrick(TetrisGame *game, unsigned int x, unsigned int y) { 
 	if (game->isPaused)
@@ -381,28 +289,3 @@ void rotateBrick(TetrisGame *game, unsigned int direction) { // {{{
 void dropBrick(TetrisGame *game){
 	while(moveBrick(game, 0 ,1));
 }
-
-void processInputs(TetrisGame *game) { // {{{
-	int c = getchar();
-	do {
-		switch (c) {
-			case ' ': moveBrick(game, 0, 1); break;
-			case 'd': case 'D': dropBrick(game); break;
-			case 'p': case 'P': pauseUnpause(game); break;
-			case 'q': case 'Q': game->isRunning = 0; break;
-			case 27: // ESC
-				getchar();
-				switch (getchar()) {
-					case 'A': rotateBrick(game,  1);  break; // up
-					case 'B': rotateBrick(game, 2);  break; // down
-					case 'C': moveBrick(game, 1, 0); break; // right
-					case 'D': moveBrick(game, -1, 0); break; // left
-					default: break;
-				}	
-				break;
-			default:  break;
-		}
-		c = getchar();
-	} while (c != -1);
-} // }}}
-
