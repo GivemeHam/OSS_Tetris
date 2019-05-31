@@ -132,9 +132,12 @@ void playGame(){
 }
 int replay(){
 	char replay = 'y';
+	char c='\0';
 	while(1){
 		printf("replay? (y/n) :");
 		scanf("%c", &replay);
+		c=getchar();
+		while(c != '\n') c=getchar();
 		if(replay == 'y' || replay == 'n'
 			|| replay == 'Y' || replay == 'N') break;
 		printf("Insert Only 'y' or 'n'\n");
