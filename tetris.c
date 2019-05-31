@@ -103,6 +103,23 @@ TetrisGame *newTetrisGame(unsigned int width, unsigned int height) { // {{{
 	initTimer(game);
 	return game;
 } // }}}
+void sigException(int errValue){
+	if(errValue == -1){
+		perror("Fail sigAction!\n");
+		sleep(3);
+		return;
+	}
+	else return;
+}
+
+void termException(int errValue){
+	if(errValue == -1){
+		perror("Fail termSetting!\n");
+		sleep(3);
+		return;
+	}
+	else return;
+}
 void initGame(TetrisGame *game){
 	dieIfOutOfMemory(game);
 	game->width = 10;
@@ -120,22 +137,22 @@ void initGame(TetrisGame *game){
 
 void initTerm(TetrisGame *game){
 	struct termios term;
-	tcgetattr(STDIN_FILENO, &game->termOrig);
-	tcgetattr(STDIN_FILENO, &term);
+	termException(tcgetattr(STDIN_FILENO, &game->termOrig));
+	termException(tcgetattr(STDIN_FILENO, &term));
 	term.c_lflag &= ~(ICANON|ECHO);
 	term.c_cc[VTIME] = 0;
 	term.c_cc[VMIN] = 0;
-	tcsetattr(STDIN_FILENO, TCSANOW, &term);
+	termException(tcsetattr(STDIN_FILENO, TCSANOW, &term));
 }
 void initSig(){
 	struct sigaction signalAction;
 	sigemptyset(&signalAction.sa_mask);
 	signalAction.sa_handler = signalHandler;
 	signalAction.sa_flags = 0;
-	sigaction(SIGINT,  &signalAction, NULL);
-	sigaction(SIGTERM, &signalAction, NULL);
-	sigaction(SIGSEGV, &signalAction, NULL);
-	sigaction(SIGALRM, &signalAction, NULL);
+	sigException(sigaction(SIGINT,  &signalAction, NULL));
+	sigException(sigaction(SIGTERM, &signalAction, NULL));
+	sigException(sigaction(SIGSEGV, &signalAction, NULL));
+	sigException(sigaction(SIGALRM, &signalAction, NULL));
 }
 void initTimer(TetrisGame *game){
 	game->timer.it_value.tv_usec = game->sleepUsec;
