@@ -124,12 +124,20 @@ void playGame(){
 		}
 		game->sleepUsec = 0;
 		sleep(3000);
+		gameover(game);
 		destroyTetrisGame(game);
 	
 		if(replay()) continue;
 		else break;
 	}
 }
+
+void gameover(TetrisGame *games){
+	for(int i=0; i<games->size; i++)
+		if(games->board[i]!=0) games->board[i] = games->nextBrick.color;
+	printBoard(games);
+}
+
 int replay(){
 	char replay = 'y';
 	char c='\0';

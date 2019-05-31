@@ -325,8 +325,9 @@ void tick(TetrisGame *game) {
 		landBrick(game);
 		clearFullRows(game);
 		nextBrick(game);
-		if (brickCollides(game))
+		if (brickCollides(game)){
 			game->isRunning = 0;
+		}
 	}
 
 	printBoard(game);

@@ -39,6 +39,7 @@ typedef struct { // TetrisGame {{{
 extern void signalHandler(int signal);
 extern void printBoard(TetrisGame *game);
 extern void playGame();
+extern void gameover();
 extern int replay();
 
 TetrisGame *newTetrisGame();
