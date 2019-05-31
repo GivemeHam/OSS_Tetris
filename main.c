@@ -65,6 +65,7 @@ void printBoard(TetrisGame *gamep) { // {{{
 
 void welcome() { // {{{
 	printf("tetris-term  Copyright (C) 2014  Gjum\n");
+	printf("OSS_Tetris team contributes this project.\n");
 	printf("\n");
 	printf("This program comes with ABSOLUTELY NO WARRANTY.\n");
 	printf("This is free software, and you are welcome to redistribute it\n");
@@ -82,7 +83,7 @@ void welcome() { // {{{
 	printf("<Right> move brick right\n");
 	printf("<Up>    rotate brick clockwise\n");
 	printf("<Down>  rotate brick counter-clockwise\n");
-	//printf("<?????> drop brick down\n");
+	printf("<d>     drop brick down\n");
 	printf("<Space> move brick down by one step\n");
 	printf("<p>     pause game\n");
 	printf("<q>     quit game\n");
