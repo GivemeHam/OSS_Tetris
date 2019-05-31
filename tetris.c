@@ -124,7 +124,7 @@ void initGame(TetrisGame *game){
 	dieIfOutOfMemory(game);
 	game->width = 10;
 	game->height = 20;
-	game->size = game->width * game->height;
+	game->size = (game->width) * (game->height);
 	game->board = calloc(game->size, sizeof(int));
 	dieIfOutOfMemory(game->board);
 	game->isRunning = 1;
