@@ -50,4 +50,15 @@ void initTimer(TetrisGame *game);
 void destroyTetrisGame(TetrisGame *game);
 void processInputs(TetrisGame *game);
 void tick(TetrisGame *game);
-unsigned char colorOfBrickAt(FallingBrick *brick, int x, int y);
+unsigned char colorOfBrickAt(FallingBrick *brick,unsigned int x,unsigned int y);
+
+//Added functions
+unsigned int xyToBrickXY(unsigned int brickXY,unsigned int xy);
+unsigned int isOutBrick(unsigned int location);
+unsigned int xyToBricklocation(unsigned int x,unsigned int y);
+unsigned int isBrickParticle(FallingBrick *brick,unsigned int location,unsigned int i);
+unsigned int particleToX(unsigned int p,unsigned int x);
+unsigned int particleToY(unsigned int p,unsigned int y);
+unsigned int xyTogameboard(unsigned int x,unsigned int y,unsigned int width);
+unsigned int isOverlap(unsigned int particle, TetrisGame *game);
+void changeRotation(TetrisGame * game,char direction);

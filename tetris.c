@@ -150,12 +150,12 @@ void destroyTetrisGame(TetrisGame *game) { // {{{
 	free(game);
 } // }}}
 
-int xyToBrickXY(int brickXY, int xy){
-	int rst = xy - brickXY;
+unsigned int xyToBrickXY(unsigned int brickXY,unsigned int xy){
+	unsigned int rst = xy - brickXY;
 	return rst;
 }
 
-int isOutBrick(int location)
+unsigned int isOutBrick(unsigned int location)
 {
 	if(location < 0 )
 		return 1;
@@ -165,25 +165,27 @@ int isOutBrick(int location)
 		return 0;
 }
 
-int xyToBricklocation(int x,int y){
-	int rst = x + 4*y ;
+unsigned int xyToBricklocation(unsigned int x,unsigned int y){
+	unsigned int rst = x + 4*y ;
 	return rst;
 }
 
-int isBrickParticle(FallingBrick *brick, int location,int i){
+unsigned int isBrickParticle(FallingBrick *brick,unsigned int location,unsigned int i){
 	if (location == bricks[brick->type][brick->rotation][i])
 		return 1;
 	else
 		return 0;
 }
 
-unsigned char colorOfBrickAt(FallingBrick *brick, int x, int y) { // {{{
-	int brickXY = 0;
-	
+unsigned char colorOfBrickAt(FallingBrick *brick,unsigned int x,unsigned int y) { // {{{
+	unsigned int brickXY = 0;
+	unsigned int brickY;
+	unsigned int brickX;
+
 	if (brick->type < 0)
 		return 0;
 
-	int brickY = xyToBrickXY(brick->y, y);
+	brickY = xyToBrickXY(brick->y, y);
 	if (isOutBrick(brickY))
 		return 0;
 
@@ -192,7 +194,7 @@ unsigned char colorOfBrickAt(FallingBrick *brick, int x, int y) { // {{{
 		return 0;
 
 	brickXY = xyToBricklocation(brickX, brickY);
-	for (int i = 0; i < 4; i++) {
+	for (unsigned int i = 0; i < 4; i++) {
 		if (isBrickParticle(brick, brickXY, i))
 			return brick->color;
 	}
@@ -200,22 +202,22 @@ unsigned char colorOfBrickAt(FallingBrick *brick, int x, int y) { // {{{
 } // }}}
 
 
-int particleToX(int p, int x){
-	int particle = p % 4 + x;
+unsigned int particleToX(unsigned int p,unsigned int x){
+	unsigned int particle = p % 4 + x;
 	return particle;
 }
 
-int particleToY(int p, int y){
-	int particle = p / 4 + y;
+unsigned int particleToY(unsigned int p,unsigned int y){
+	unsigned int particle = p / 4 + y;
 	return particle;
 }
 
-int xyTogameboard(int x, int y, int width){
-	int rst = x + y * width;
+unsigned int xyTogameboard(unsigned int x,unsigned int y,unsigned int width){
+	unsigned int rst = x + y * width;
 	return rst;
 }
 
-int isOverlap(int particle, TetrisGame *game){
+unsigned int isOverlap(unsigned int particle, TetrisGame *game){
 	if(particle < 0)
 		return 0;
 	if(particle >= game->size)
@@ -226,14 +228,15 @@ int isOverlap(int particle, TetrisGame *game){
 }
 
 
-static char brickCollides(TetrisGame *game) { // {{{
+char brickCollides(TetrisGame *game) { // {{{
 	for (int i = 0; i < 4; i++) {
-		int particle = bricks[game->brick.type][game->brick.rotation][i];
-		int x = particleToX(particle , game->brick.x);
+		unsigned int particle = bricks[game->brick.type][game->brick.rotation][i];
+		unsigned int y = 0;
+		unsigned int x = particleToX(particle , game->brick.x);
 		if (x < 0 || x >= game->width)
 			return 1;
 
-		int y = particleToY(particle, game->brick.y);
+		y = particleToY(particle, game->brick.y);
 		if (y >= game->height)
 			return 1;
 
@@ -317,7 +320,7 @@ static void pauseUnpause(TetrisGame *game) {
 	game->isPaused ^= 1;
 }
 
-int moveBrick(TetrisGame *game, char x, char y) { 
+unsigned int moveBrick(TetrisGame *game, char x, char y) { 
 	if (game->isPaused) return;
 	game->brick.x += x;
 	game->brick.y += y;
@@ -330,13 +333,13 @@ int moveBrick(TetrisGame *game, char x, char y) {
 	return 1;
 } 
 
-static void changeRotation(TetrisGame *game,char direction){
+void changeRotation(TetrisGame *game,char direction){
 	game->brick.rotation = (game->brick.rotation + 4 + direction)%4;
 }
-
-static void rotateBrick(TetrisGame *game, char direction) { 
-	if (game->isPaused) return;
+void rotateBrick(TetrisGame *game, char direction) { // {{{
 	unsigned char oldRotation = game->brick.rotation;
+	if (game->isPaused)
+		return 0;
 	changeRotation(game,direction);
 	if (brickCollides(game))
 	{
@@ -346,7 +349,7 @@ static void rotateBrick(TetrisGame *game, char direction) {
 	printBoard(game);
 } // }}}
 
-static void dropBrick(TetrisGame *game){
+void dropBrick(TetrisGame *game){
 	while(moveBrick(game, 0 ,1));
 }
 
