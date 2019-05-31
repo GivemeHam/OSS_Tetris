@@ -109,14 +109,19 @@ void gameover(TetrisGame *game){
 int replay(){
 	char replay = 'y';
 	int c='\0';
+	int chk=0;
 	while(1){
 		printf("replay? (y/n) :");
 		scanf("%c", &replay);
 		c=getchar();
-		while(c != '\n') c=getchar();
-		if(replay == 'y' || replay == 'n'
-			|| replay == 'Y' || replay == 'N') break;
+		while(c != '\n'){
+		       	c=getchar();
+			chk=1;
+		}
+		if(chk==0 &&(replay == 'y' || replay == 'n'
+			|| replay == 'Y' || replay == 'N')) break;
 		printf("Insert Only 'y' or 'n'\n");
+		chk=0;
 	}	
 	if(replay == 'y' || replay =='Y') return 1;
 	else return 0;
@@ -127,16 +132,21 @@ int setLevel(){
 	int level[5] = {500000, 400000, 300000, 200000, 100000};
 	int select_level = 0;
 	int c='\0';
+	int chk=0;
 
 	while(1){	
 		printf("Set Level(1~5): ");
 		scanf("%d",&select_level);
 		c=getchar();
-		while(c != '\n') c=getchar();
-		if(select_level<1 || select_level>5) {
+		while(c != '\n'){
+		       	c=getchar();
+			chk=1;
+		}
+		if(chk==1 || select_level<1 || select_level>5) {
 			printf("[!!!]Insert 1-5\n");
 		}
 		else break;
+		chk=0;
 	}
 	return level[select_level-1];
 }
