@@ -77,6 +77,20 @@ static void nextBrick(TetrisGame *game) { // {{{
 	game->nextBrick.x = 0;
 	game->nextBrick.y = 0;
 } // }}}
+int setLevel(){
+	int level[5] = {500000, 400000, 300000, 200000, 100000};
+	int select_level = 0;
+	while(1){	
+		printf("Set Level(1~5): ");
+		scanf("%d",&select_level);
+		if(select_level<1 || select_level>5) {
+			printf("[!!!]Insert 1-5\n");
+			getchar();
+		}
+		else break;
+	}
+	return level[select_level-1];
+}
 
 TetrisGame *newTetrisGame(unsigned int width, unsigned int height) { // {{{
 	TetrisGame *game = malloc(sizeof(TetrisGame));
@@ -89,16 +103,16 @@ TetrisGame *newTetrisGame(unsigned int width, unsigned int height) { // {{{
 	initTimer(game);
 	return game;
 } // }}}
-void *initGame(TetrisGame *game){
+void initGame(TetrisGame *game){
 	dieIfOutOfMemory(game);
 	game->width = 10;
 	game->height = 20;
 	game->size = game->width * game->height;
-	game->board = calloc(game->size, sizeof(char));
+	game->board = calloc(game->size, sizeof(int));
 	dieIfOutOfMemory(game->board);
 	game->isRunning = 1;
 	game->isPaused  = 0;
-	game->sleepUsec = 500000;
+	game->sleepUsec = setLevel();
 	game->score = 0;
 	nextBrick(game); // fill preview
 	nextBrick(game); // put into game
@@ -130,18 +144,18 @@ void initTimer(TetrisGame *game){
 void destroyTetrisGame(TetrisGame *game) { // {{{
 	if (game == NULL) return;
 	tcsetattr(STDIN_FILENO, TCSANOW, &game->termOrig);
-	printf("Your score: %i\n", game->score);
+	printf("Your score: %li\n", game->score);
 	printf("Game over.\n");
 	free(game->board);
 	free(game);
 } // }}}
 
-int xyToBrickXY(int brickXY, int xy){
-	int rst = xy - brickXY;
+unsigned int xyToBrickXY(unsigned int brickXY,unsigned int xy){
+	unsigned int rst = xy - brickXY;
 	return rst;
 }
 
-int isOutBrick(int location)
+unsigned int isOutBrick(unsigned int location)
 {
 	if(location < 0 )
 		return 1;
@@ -151,34 +165,36 @@ int isOutBrick(int location)
 		return 0;
 }
 
-int xyToBricklocation(int x,int y){
-	int rst = x + 4*y ;
+unsigned int xyToBricklocation(unsigned int x,unsigned int y){
+	unsigned int rst = x + 4*y ;
 	return rst;
 }
 
-int isBrickParticle(FallingBrick *brick, int location,int i){
+unsigned int isBrickParticle(FallingBrick *brick,unsigned int location,unsigned int i){
 	if (location == bricks[brick->type][brick->rotation][i])
 		return 1;
 	else
 		return 0;
 }
 
-unsigned char colorOfBrickAt(FallingBrick *brick, int x, int y) { // {{{
-	int brickXY = 0;
-	
+unsigned int colorOfBrickAt(FallingBrick *brick,unsigned int x,unsigned int y) { // {{{
+	unsigned int brickXY = 0;
+	unsigned int brickY;
+	unsigned int brickX;
+
 	if (brick->type < 0)
 		return 0;
 
-	int brickY = xyToBrickXY(brick->y, y);
+	brickY = xyToBrickXY(brick->y, y);
 	if (isOutBrick(brickY))
 		return 0;
 
-	int brickX = xyToBrickXY(brick->x, x);
+	brickX = xyToBrickXY(brick->x, x);
 	if (isOutBrick(brickX))
 		return 0;
 
 	brickXY = xyToBricklocation(brickX, brickY);
-	for (int i = 0; i < 4; i++) {
+	for (unsigned int i = 0; i < 4; i++) {
 		if (isBrickParticle(brick, brickXY, i))
 			return brick->color;
 	}
@@ -186,22 +202,22 @@ unsigned char colorOfBrickAt(FallingBrick *brick, int x, int y) { // {{{
 } // }}}
 
 
-int particleToX(int p, int x){
-	int particle = p % 4 + x;
+unsigned int particleToX(unsigned int p,unsigned int x){
+	unsigned int particle = p % 4 + x;
 	return particle;
 }
 
-int particleToY(int p, int y){
-	int particle = p / 4 + y;
+unsigned int particleToY(unsigned int p,unsigned int y){
+	unsigned int particle = p / 4 + y;
 	return particle;
 }
 
-int xyTogameboard(int x, int y, int width){
-	int rst = x + y * width;
+unsigned int xyTogameboard(unsigned int x,unsigned int y,unsigned int width){
+	unsigned int rst = x + y * width;
 	return rst;
 }
 
-int isOverlap(int particle, TetrisGame *game){
+unsigned int isOverlap(unsigned int particle, TetrisGame *game){
 	if(particle < 0)
 		return 0;
 	if(particle >= game->size)
@@ -212,14 +228,15 @@ int isOverlap(int particle, TetrisGame *game){
 }
 
 
-static char brickCollides(TetrisGame *game) { // {{{
+unsigned int brickCollides(TetrisGame *game) { // {{{
 	for (int i = 0; i < 4; i++) {
-		int particle = bricks[game->brick.type][game->brick.rotation][i];
-		int x = particleToX(particle , game->brick.x);
+		unsigned int particle = bricks[game->brick.type][game->brick.rotation][i];
+		unsigned int y = 0;
+		unsigned int x = particleToX(particle , game->brick.x);
 		if (x < 0 || x >= game->width)
 			return 1;
 
-		int y = particleToY(particle, game->brick.y);
+		y = particleToY(particle, game->brick.y);
 		if (y >= game->height)
 			return 1;
 
@@ -266,9 +283,9 @@ static void clearFullRows(TetrisGame *game) {
 		}
 		if (clearRow) {
 			for (row = y; row > 0; row--)
-				memcpy(game->board + width*row, game->board + width*(row-1), width);
+				memcpy(game->board + width*row, game->board + width*(row-1), width*sizeof(unsigned int));
 			
-			memset(game->board,0,width);//instead bzero
+			memset(game->board,0,width*sizeof(unsigned int));//instead bzero
 			rowsCleared++;
 		}
 	}
@@ -303,26 +320,34 @@ static void pauseUnpause(TetrisGame *game) {
 	game->isPaused ^= 1;
 }
 
-int moveBrick(TetrisGame *game, char x, char y) { 
-	if (game->isPaused) return;
+unsigned int moveBrick(TetrisGame *game, unsigned int x, unsigned int y) { 
+	if (game->isPaused)
+		return 0;
 	game->brick.x += x;
 	game->brick.y += y;
 	if (brickCollides(game)) {
-		game->brick.x -= x;
-		game->brick.y -= y;
+		game->brick.x -=x;
+		game->brick.y -=y;
 		return 0;
 	}
 	printBoard(game);
 	return 1;
 } 
 
-static void changeRotation(TetrisGame *game,char direction){
-	game->brick.rotation = (game->brick.rotation + 4 + direction)%4;
-}
+void changeRotation(TetrisGame *game,unsigned int direction){
+	unsigned int rotate = game->brick.rotation + 4;
 
-static void rotateBrick(TetrisGame *game, char direction) { 
-	if (game->isPaused) return;
-	unsigned char oldRotation = game->brick.rotation;
+	if (direction == 1)
+		rotate++;
+	else
+		rotate--;
+
+	game->brick.rotation = rotate%4;
+}
+void rotateBrick(TetrisGame *game, unsigned int direction) { // {{{
+	unsigned int oldRotation = game->brick.rotation;
+	if (game->isPaused)
+		return ;
 	changeRotation(game,direction);
 	if (brickCollides(game))
 	{
@@ -332,24 +357,24 @@ static void rotateBrick(TetrisGame *game, char direction) {
 	printBoard(game);
 } // }}}
 
-static void dropBrick(TetrisGame *game){
+void dropBrick(TetrisGame *game){
 	while(moveBrick(game, 0 ,1));
 }
 
 void processInputs(TetrisGame *game) { // {{{
-	char c = getchar();
+	int c = getchar();
 	do {
 		switch (c) {
 			case ' ': moveBrick(game, 0, 1); break;
-			case 'd': dropBrick(game); break;
-			case 'p': pauseUnpause(game); break;
-			case 'q': game->isRunning = 0; break;
-			case 27:// ESC
+			case 'd': case 'D': dropBrick(game); break;
+			case 'p': case 'P': pauseUnpause(game); break;
+			case 'q': case 'Q': game->isRunning = 0; break;
+			case 27: // ESC
 				getchar();
 				switch (getchar()) {
 					case 'A': rotateBrick(game,  1);  break; // up
-					case 'B': rotateBrick(game, -1);  break; // down
-					case 'C': moveBrick(game,  1, 0); break; // right
+					case 'B': rotateBrick(game, 2);  break; // down
+					case 'C': moveBrick(game, 1, 0); break; // right
 					case 'D': moveBrick(game, -1, 0); break; // left
 					default: break;
 				}	

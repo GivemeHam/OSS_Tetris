@@ -27,34 +27,38 @@
 
 TetrisGame *game;
 
-void printBoard(TetrisGame *game) { // {{{
-	int width = game->width;
-	char line[width * 2 + 1];
-	memset(line, '-', width * 2);
-	line[width * 2] = 0;
-	printf("\e[%iA", game->height + 2); // move to above the board
+void printBoard(TetrisGame *gamep) { // {{{
+	unsigned int color = 0;
+	char line[gamep->width * 2 + 1];
+	memset(line, '-', gamep->width * 2);
+	line[gamep->width * 2] = 0;
+	printf("\e[%iA", gamep->height + 2); // move to above the board
 	printf("/%s+--------\\\n", line);
-	for (int y = 0; y < game->height; y++) {
+	for (unsigned int y = 0; y < gamep->height; y++) {
 		printf("|");
-		for (int x = 0; x < game->width; x++) {
-			char c = game->board[x + y * game->width];
-			if (c == 0) // empty? try falling brick
-				c = colorOfBrickAt(&game->brick, x, y);
-			printf("\e[3%i;4%im  ", c, c);
+		for (unsigned int x = 0; x < gamep->width; x++) {
+			color = gamep->board[x + y * gamep->width];
+			if (color == 0) // empty? try falling brick
+				color = colorOfBrickAt(&gamep->brick, x, y);
+			printf("\e[3%i;4%im  ", color, color);
 		}
-		if (y == 4) printf("\e[39;49m|  \e[1mScore\e[0m |\n");
-		else if (y == 5) printf("\e[39;49m| %6i |\n", game->score);
-		else if (y == 6) printf("\e[39;49m+--------/\n");
-		else {
-			if (y < 4) {
-				printf("\e[39;49m|");
-				for (int x = 0; x < 4; x++) {
-					char c = colorOfBrickAt(&game->nextBrick, x, y);
-					printf("\e[3%i;4%im  ", c, c);
-				}
+		if (y <= 6 )
+		{
+			switch(y){
+				case 4: printf("\e[39;49m|  \e[1mScore\e[0m |\n"); break;
+				case 5: printf("\e[39;49m| %6li |\n", gamep->score); break;
+				case 6: printf("\e[39;49m+--------/\n"); break;
+				default: 
+					printf("\e[39;49m|");
+					for (unsigned int x = 0; x < 4; x++) {
+						color = colorOfBrickAt(&gamep->nextBrick, x, y);
+						printf("\e[3%i;4%im  ", color, color);
+					}
+					printf("\e[39;49m|\n");
 			}
-			printf("\e[39;49m|\n");
 		}
+		else
+			printf("\e[39;49m|\n");
 	}
 	printf("\\%s/\n", line);
 } // }}}
@@ -101,20 +105,39 @@ void signalHandler(int signal) { // {{{
 	return;
 } // }}}
 
-int main(int argc, char **argv) { // {{{
+int main(int  argc, char **argv) { // {{{
 	srand(time(0));
 	welcome();
 	playGame();
 	return 0;
 } // }}}
 void playGame(){
-	game = newTetrisGame();
-	// create space for the board
-	for (int i = 0; i < game->height + 2; i++) printf("\n");
-	printBoard(game);
-	while (game->isRunning) {
-		usleep(50000);
-		processInputs(game);
+	while(1){
+		game =  newTetrisGame();
+		// create space for the board
+		for (int i = 0; i < game->height + 2; i++) printf("\n");
+		printBoard(game);
+		while (game->isRunning) {
+			usleep(50000);
+			processInputs(game);
+		}
+		game->sleepUsec = 0;
+		sleep(3000);
+		destroyTetrisGame(game);
+	
+		if(replay()) continue;
+		else break;
 	}
-	destroyTetrisGame(game);
+}
+int replay(){
+	char replay = 'y';
+	while(1){
+		printf("replay? (y/n) :");
+		scanf("%c", &replay);
+		if(replay == 'y' || replay == 'n'
+			|| replay == 'Y' || replay == 'N') break;
+		printf("Insert Only 'y' or 'n'\n");
+	}	
+	if(replay == 'y' || replay =='Y') return 1;
+	else return 0;
 }
