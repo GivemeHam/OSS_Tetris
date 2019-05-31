@@ -130,9 +130,10 @@ int replay(){
 	while(1){
 		printf("replay? (y/n) :");
 		scanf("%c", &replay);
-		if(replay == 'y' || replay == 'n') break;
+		if(replay == 'y' || replay == 'n'
+			||replay == 'Y' || replay 'N') break;
 		printf("Insert Only 'y' or 'n'\n");
 	}	
-	if(replay == 'y') return 1;
+	if(replay == 'y' || replay =='Y') return 1;
 	else return 0;
 }
